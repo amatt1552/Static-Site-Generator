@@ -1,7 +1,7 @@
 import unittest
 from textnode import TextNode, TextType
 from leafnode import LeafNode
-from markdown_conversion import split_nodes_delimiter
+from inline_markdown import split_nodes_delimiter
 
 class TestHtmlNode(unittest.TestCase):
     def test_text(self):

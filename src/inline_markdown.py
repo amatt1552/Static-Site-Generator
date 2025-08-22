@@ -1,13 +1,6 @@
 from textnode import TextNode, TextType
 import re
 
-def markdown_to_blocks(markdown):
-    blocks = markdown.split("\n\n")
-    new_blocks = []
-    for block in blocks:
-        if(block != "\n"):
-            new_blocks.append(block.strip("\n "))
-    return new_blocks
 
 def convert_markdown(old_nodes):
     new_nodes = split_nodes_image(old_nodes)
@@ -43,12 +36,12 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
     return new_nodes
 
 def split_nodes_image(old_nodes):
-    return handle_nodes_with_links(old_nodes, TextType.IMAGE, "!")
+    return __handle_nodes_with_links(old_nodes, TextType.IMAGE, "!")
 
 def split_nodes_link(old_nodes):
-    return handle_nodes_with_links(old_nodes)
+    return __handle_nodes_with_links(old_nodes)
 
-def handle_nodes_with_links(old_nodes, text_type = TextType.LINK, delimiter = ""):
+def __handle_nodes_with_links(old_nodes, text_type = TextType.LINK, delimiter = ""):
     new_nodes = []
     for old_node in old_nodes:
         if old_node.text_type != TextType.TEXT:

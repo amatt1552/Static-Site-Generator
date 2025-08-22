@@ -1,12 +1,14 @@
 import unittest
-from markdown_conversion import (
+from inline_markdown import (
     split_nodes_delimiter,
     extract_markdown_images,
     extract_markdown_links,
     split_nodes_image,
     split_nodes_link,
     convert_markdown,
-    markdown_to_blocks
+)
+from block_markdown import (
+    markdown_to_blocks, block_to_block_type, BlockType
 )
 
 from textnode import TextNode, TextType
@@ -352,6 +354,126 @@ This is the same paragraph on a new line
                 "- This is a list\n- with items",
             ],
         )
+
+    
+    def test_block_to_block_heading(self):
+        md = """
+# HEADING
+
+### HEADING 3
+
+###### HEADING 6
+
+####### heading out of range
+
+#invalid heading
+
+#
+
+Fake Heading # 
+"""
+        blocks = markdown_to_blocks(md)
+        results = []
+        for block in blocks:
+            results.append(block_to_block_type(block))
+        self.assertEqual(results, 
+                         [
+                             BlockType.HEADING,
+                             BlockType.HEADING,
+                             BlockType.HEADING,
+                             BlockType.PARAGRAPH,
+                             BlockType.PARAGRAPH,
+                             BlockType.PARAGRAPH,
+                             BlockType.PARAGRAPH
+                         ])
+        
+    def test_block_to_block_code(self):
+        md = """
+```code block```
+
+```invalid code block
+
+`invalid code block
+"""
+        blocks = markdown_to_blocks(md)
+        results = []
+        for block in blocks:
+            results.append(block_to_block_type(block))
+        self.assertEqual(results, 
+                         [
+                             BlockType.CODE,
+                             BlockType.PARAGRAPH,
+                             BlockType.PARAGRAPH
+                         ])
+
+    def test_block_to_block_quote(self):
+        md = """
+>I'm a quote
+>me too!
+>no! I am
+
+>I'm a lonely quote
+
+>>Still a quote!
+
+python > java
+"""
+        blocks = markdown_to_blocks(md)
+        results = []
+        for block in blocks:
+            results.append(block_to_block_type(block))
+        self.assertEqual(results, 
+                         [
+                             BlockType.QUOTE,
+                             BlockType.QUOTE,
+                             BlockType.QUOTE,
+                             BlockType.PARAGRAPH
+                         ])
+    
+    def test_block_to_block_unordered(self):
+        md = """
+- Im unordered
+- me too!
+- no! I am
+
+- I'm a lonely list
+
+-Fake list
+"""
+        blocks = markdown_to_blocks(md)
+        results = []
+        for block in blocks:
+            results.append(block_to_block_type(block))
+        self.assertEqual(results, 
+                         [
+                             BlockType.UNORDERED_LIST,
+                             BlockType.UNORDERED_LIST,
+                             BlockType.PARAGRAPH
+                         ])
+
+    def test_block_to_block_ordered(self):
+        md = """
+1. Im ordered
+2. me too!
+3. me three!
+
+1. I'm a lonely list
+
+100. I'm huge!
+
+1.Fake list
+"""
+        blocks = markdown_to_blocks(md)
+        results = []
+        for block in blocks:
+            results.append(block_to_block_type(block))
+        self.assertEqual(results, 
+                         [
+                             BlockType.ORDERED_LIST,
+                             BlockType.ORDERED_LIST,
+                             BlockType.ORDERED_LIST,
+                             BlockType.PARAGRAPH
+                         ])
 
 if __name__ == "__main__":
     unittest.main()
