@@ -1,6 +1,7 @@
 import unittest
-from src.textnode import TextNode, TextType
-from src.leafnode import LeafNode
+from textnode import TextNode, TextType
+from leafnode import LeafNode
+from markdown_conversion import split_nodes_delimiter
 
 class TestHtmlNode(unittest.TestCase):
     def test_text(self):
@@ -38,7 +39,6 @@ class TestHtmlNode(unittest.TestCase):
             html_node.to_html(),
             '<img src="https://www.catfeet.com" alt="this is an image node"></img>'
             )
-
 
 if __name__ == "__main__":
     unittest.main()
