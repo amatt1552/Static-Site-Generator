@@ -8,7 +8,9 @@ from inline_markdown import (
     convert_markdown,
 )
 from block_markdown import (
-    markdown_to_blocks, block_to_block_type, BlockType
+    markdown_to_blocks, 
+    block_to_block_type, 
+    BlockType
 )
 
 from textnode import TextNode, TextType
@@ -391,6 +393,11 @@ Fake Heading #
         md = """
 ```code block```
 
+```
+big
+code block
+```
+
 ```invalid code block
 
 `invalid code block
@@ -401,6 +408,7 @@ Fake Heading #
             results.append(block_to_block_type(block))
         self.assertEqual(results, 
                          [
+                             BlockType.CODE,
                              BlockType.CODE,
                              BlockType.PARAGRAPH,
                              BlockType.PARAGRAPH
@@ -461,7 +469,11 @@ python > java
 
 100. I'm huge!
 
+1. still a list! 2. not a list
+
 1.Fake list
+
+Another Fake1. 
 """
         blocks = markdown_to_blocks(md)
         results = []
@@ -472,6 +484,8 @@ python > java
                              BlockType.ORDERED_LIST,
                              BlockType.ORDERED_LIST,
                              BlockType.ORDERED_LIST,
+                             BlockType.ORDERED_LIST,
+                             BlockType.PARAGRAPH,
                              BlockType.PARAGRAPH
                          ])
 
