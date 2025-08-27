@@ -2,6 +2,9 @@ import re
 from textnode import TextNode, TextType
 from leafnode import LeafNode
 from parentnode import ParentNode
+from inline_markdown import(
+    convert_markdown
+    )
 from block_markdown import (
     BlockType,
     block_to_block_type,
@@ -28,10 +31,31 @@ def text_to_html_node(text_node):
 
 def markdown_to_html_nodes(markdown):
     blocks = markdown_to_blocks(markdown)
-    leaf_nodes = []
+    nodes = []
     for block in blocks:
-        leaf_nodes.append(__block_to_html_node(block))
-    return ParentNode("div", leaf_nodes)
+        node = __block_to_html_node(block)
+        if(node.tag != "pre"):
+            inline_nodes = __block_to_inline(node)
+            nodes.append(inline_nodes)
+        else:
+            nodes.append(node)
+            
+    return ParentNode("div", nodes)
+
+def __block_to_inline(old_node):
+    if(not old_node.children):
+        child_text_nodes = convert_markdown([TextNode(old_node.value, TextType.TEXT)])
+        leaf_nodes = []
+        for child in child_text_nodes:
+            leaf_nodes.append(text_to_html_node(child))
+        if(len(leaf_nodes) > 0):
+            return ParentNode(old_node.tag, leaf_nodes, old_node.props)
+        return old_node
+    else:
+        leaf_nodes = []
+        for child in old_node.children:
+            leaf_nodes.append(__block_to_inline(child))
+        return ParentNode(old_node.tag, leaf_nodes, old_node.props)
 
 def __block_to_html_node(block):
    block_type = block_to_block_type(block)
